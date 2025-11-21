@@ -1,4 +1,4 @@
-create a python file called run-sql with the contents below, 
+create a python file called run-sql-dbrole with the contents below, 
 changing the server and database variables at the top to those created earlier in the process.
 If you were not asked to create them then leave them as is.
 
