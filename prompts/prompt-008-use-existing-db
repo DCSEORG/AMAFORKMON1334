@@ -1,6 +1,6 @@
-use the SQL database found at the below connection for the APIs:
+use the SQL database you created earlier:
 
-Server=tcp:sql-expense-mgmt-xyz.database.windows.net,1433;Initial Catalog=ExpenseManagementDB;Encrypt=True;
+Server=tcp:sql-expense-mgmt-xyz.database.windows.net,1433;Initial Catalog=<ExampleDB>;Encrypt=True;
 TrustServerCertificate=False;Connection Timeout=30;
 
 connect using the managedidentiy you created before using this format:
