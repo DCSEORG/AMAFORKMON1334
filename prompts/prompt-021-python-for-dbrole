@@ -16,7 +16,7 @@ also update the deploy.sh file to add this:
 pip3 install --quiet pyodbc azure-identity
 
 # Run the Python script
-python3 run-sql.py
+python3 run-sql-dbrole.py
 
 also create a file called script.sql and put the following changing MANAGED-IDENTITY to the user assigned managed identity you created earlier 
 
