@@ -1,0 +1,80 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "View Expenses";
+}
+
+<h2>Expenses</h2>
+
+<div class="form-group">
+    <label for="filterInput">Filter:</label>
+    <input type="text" id="filterInput" class="form-control" placeholder="Filter by category, amount, or status..." onkeyup="filterTable()" />
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <script>
+        showError('@Html.Raw(Model.ErrorMessage.Replace("'", "\\'"))');
+    </script>
+}
+
+<table id="expensesTable">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var expense in Model.Expenses)
+        {
+            <tr>
+                <td>@expense.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                <td>@expense.CategoryName</td>
+                <td>£@expense.Amount.ToString("F2")</td>
+                <td>
+                    <span class="status-badge status-@expense.StatusName.ToLower()">
+                        @expense.StatusName
+                    </span>
+                </td>
+                <td>@(expense.Description ?? "")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div style="margin-top: 20px;">
+    <a href="/AddExpense" class="btn btn-primary">Add New Expense</a>
+</div>
+
+@section Scripts {
+    <script>
+        function filterTable() {
+            const input = document.getElementById('filterInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('expensesTable');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const tds = tr[i].getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < tds.length; j++) {
+                    const td = tds[j];
+                    if (td) {
+                        const txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+}

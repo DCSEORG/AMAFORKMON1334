@@ -1,0 +1,121 @@
+@page
+@model ChatModel
+@{
+    ViewData["Title"] = "AI Chat Assistant";
+}
+
+<h2>AI Chat Assistant</h2>
+<p>Ask questions about expenses or request actions using natural language.</p>
+
+<div class="chat-container">
+    <div id="chatMessages" class="chat-messages">
+        <div class="chat-message assistant">
+            Hello! I'm your AI assistant for expense management. I can help you:
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>View all expenses or filter by status</li>
+                <li>Create new expenses</li>
+                <li>Approve pending expenses</li>
+                <li>Get information about expense categories</li>
+            </ul>
+            What would you like to do?
+        </div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" class="form-control chat-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" />
+        <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+    </div>
+</div>
+
+<div id="genaiStatus" style="margin-top: 20px; padding: 15px; border-radius: 8px; display: none;">
+</div>
+
+@section Scripts {
+    <script>
+        let conversationHistory = [];
+
+        async function checkGenAIStatus() {
+            try {
+                const response = await fetch('/api/Chat/status');
+                const data = await response.json();
+                
+                if (!data.configured) {
+                    const statusDiv = document.getElementById('genaiStatus');
+                    statusDiv.style.display = 'block';
+                    statusDiv.style.background = '#fff3cd';
+                    statusDiv.style.color = '#856404';
+                    statusDiv.innerHTML = '⚠️ GenAI services are not deployed. Chat will provide basic responses. Run deploy-with-chat.sh to enable full AI functionality.';
+                }
+            } catch (error) {
+                console.error('Error checking GenAI status:', error);
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Add to history
+            conversationHistory.push(`User: ${message}`);
+
+            // Show loading
+            const messagesDiv = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chat-message assistant';
+            loadingDiv.textContent = 'Thinking...';
+            loadingDiv.id = 'loading';
+            messagesDiv.appendChild(loadingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            try {
+                const response = await fetch('/api/Chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversationHistory: conversationHistory
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Remove loading
+                document.getElementById('loading').remove();
+
+                // Add assistant response
+                addMessage(data.response, 'assistant');
+                conversationHistory.push(`Assistant: ${data.response}`);
+
+            } catch (error) {
+                document.getElementById('loading').remove();
+                addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+                console.error('Error:', error);
+            }
+        }
+
+        function addMessage(text, type) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Check status on load
+        checkGenAIStatus();
+    </script>
+}
