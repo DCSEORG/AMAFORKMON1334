@@ -30,7 +30,8 @@ public class ApproveExpensesModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var (expense, error) = await _databaseService.ApproveExpenseAsync(ExpenseId, 2); // Manager ID = 2
+        // Note: ReviewedBy should be derived from authenticated user in production
+        var (expense, error) = await _databaseService.ApproveExpenseAsync(ExpenseId, 2); // TODO: Replace with authenticated user ID
 
         if (error != null)
         {

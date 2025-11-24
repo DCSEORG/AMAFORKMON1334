@@ -42,9 +42,10 @@ public class AddExpenseModel : PageModel
         var (categories, _) = await _databaseService.GetAllCategoriesAsync();
         Categories = categories;
 
+        // Note: UserId should be derived from authenticated user in production
         var request = new CreateExpenseRequest
         {
-            UserId = 1, // Default user
+            UserId = 1, // TODO: Replace with authenticated user ID
             Amount = Amount,
             CategoryId = CategoryId,
             ExpenseDate = ExpenseDate,

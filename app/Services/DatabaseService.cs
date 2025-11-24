@@ -51,7 +51,8 @@ public class DatabaseService : IDatabaseService
 
     private string FormatDetailedError(Exception ex, string location, int lineNumber)
     {
-        var message = $"Error in {location} (Line {lineNumber}): {ex.Message}";
+        // Note: Line numbers are approximate and may shift with code changes
+        var message = $"Error in {location} (approx. Line {lineNumber}): {ex.Message}";
         
         if (ex is SqlException sqlEx)
         {
